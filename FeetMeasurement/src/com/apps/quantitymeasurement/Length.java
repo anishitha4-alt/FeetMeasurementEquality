@@ -2,10 +2,10 @@ package com.apps.quantitymeasurement;
 
 public class Length {
 
-    private final double value;
-    private final LengthUnit unit;
+    private double value;
+    private LengthUnit unit;
 
-    // Enum with conversion factors (BASE UNIT = INCHES)
+    // Enum inside class (as per your design)
     public enum LengthUnit {
         INCHES(1.0),
         FEET(12.0),
@@ -25,47 +25,43 @@ public class Length {
 
     // Constructor
     public Length(double value, LengthUnit unit) {
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException("Invalid value");
-        }
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit cannot be null");
+        if (unit == null || !Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid input");
         }
         this.value = value;
         this.unit = unit;
     }
 
     // Convert to base unit (inches)
-    private double toBaseUnit() {
+    private double convertToBaseUnit() {
         return value * unit.getFactor();
     }
 
-    // ✅ UC5: STATIC CONVERSION METHOD
-    public static double convert(double value, LengthUnit source, LengthUnit target) {
-
-        if (!Double.isFinite(value)) {
-            throw new IllegalArgumentException("Invalid value");
-        }
-        if (source == null || target == null) {
-            throw new IllegalArgumentException("Units cannot be null");
-        }
-
-        // convert to base (inches)
-        double baseValue = value * source.getFactor();
-
-        // convert to target
-        double result = baseValue / target.getFactor();
-
-        return result;
+    // Convert from base to target unit
+    private double convertFromBase(double baseValue, LengthUnit targetUnit) {
+        return baseValue / targetUnit.getFactor();
     }
 
-    // ✅ Instance conversion (returns NEW object → immutability)
-    public Length convertTo(LengthUnit targetUnit) {
-        double convertedValue = convert(this.value, this.unit, targetUnit);
-        return new Length(convertedValue, targetUnit);
+    // ✅ UC6 ADD METHOD
+    public Length add(Length thatLength) {
+        if (thatLength == null) {
+            throw new IllegalArgumentException("Length cannot be null");
+        }
+
+        double thisBase = this.convertToBaseUnit();
+        double thatBase = thatLength.convertToBaseUnit();
+
+        double sumBase = thisBase + thatBase;
+
+        double result = convertFromBase(sumBase, this.unit);
+
+        // rounding to 2 decimals
+        result = Math.round(result * 100.0) / 100.0;
+
+        return new Length(result, this.unit);
     }
 
-    // equals() using base unit comparison
+    // equals method (important for tests)
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -73,12 +69,14 @@ public class Length {
 
         Length other = (Length) obj;
 
-        double thisBase = this.toBaseUnit();
-        double otherBase = other.toBaseUnit();
+        double thisBase = this.convertToBaseUnit();
+        double otherBase = other.convertToBaseUnit();
 
-        return Math.abs(thisBase - otherBase) < 1e-6;
+        return Math.round(thisBase * 100.0) ==
+                Math.round(otherBase * 100.0);
     }
 
+    // toString (for printing)
     @Override
     public String toString() {
         return String.format("%.2f %s", value, unit);
