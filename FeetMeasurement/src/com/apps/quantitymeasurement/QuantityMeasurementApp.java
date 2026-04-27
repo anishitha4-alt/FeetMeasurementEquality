@@ -2,47 +2,42 @@ package com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    // Generic comparison method
-    public static boolean demonstrateLengthComparison(
-            double value1, Length.LengthUnit unit1,
-            double value2, Length.LengthUnit unit2) {
-
-        Length l1 = new Length(value1, unit1);
-        Length l2 = new Length(value2, unit2);
-
-        boolean result = l1.equals(l2);
-
-        System.out.println("Comparing: " + value1 + " " + unit1 +
-                " and " + value2 + " " + unit2 +
-                " => " + result);
-
-        return result;
+    // Equality
+    public static boolean demonstrateLengthEquality(Length l1, Length l2) {
+        return l1.equals(l2);
     }
 
+    // Comparison using raw values
+    public static boolean demonstrateLengthComparison(double v1, Length.LengthUnit u1,
+                                                      double v2, Length.LengthUnit u2) {
+        Length l1 = new Length(v1, u1);
+        Length l2 = new Length(v2, u2);
+        return demonstrateLengthEquality(l1, l2);
+    }
+
+    // ✅ UC5 METHOD (overloaded)
+    public static Length demonstrateLengthConversion(double value,
+                                                     Length.LengthUnit from,
+                                                     Length.LengthUnit to) {
+        double result = Length.convert(value, from, to);
+        return new Length(result, to);
+    }
+
+    // Overloaded version
+    public static Length demonstrateLengthConversion(Length length,
+                                                     Length.LengthUnit to) {
+        return length.convertTo(to);
+    }
+
+    // Main (for testing)
     public static void main(String[] args) {
 
-        System.out.println("=== UC4 Extended Unit Support ===");
+        System.out.println(Length.convert(1.0, Length.LengthUnit.FEET, Length.LengthUnit.INCHES)); // 12
+        System.out.println(Length.convert(3.0, Length.LengthUnit.YARDS, Length.LengthUnit.FEET)); // 9
+        System.out.println(Length.convert(36.0, Length.LengthUnit.INCHES, Length.LengthUnit.YARDS)); // 1
+        System.out.println(Length.convert(1.0, Length.LengthUnit.CENTIMETERS, Length.LengthUnit.INCHES)); // 0.39
 
-        // Feet ↔ Inches
-        demonstrateLengthComparison(1.0, Length.LengthUnit.FEET,
-                12.0, Length.LengthUnit.INCHES);
-
-        // Yard ↔ Inches
-        demonstrateLengthComparison(1.0, Length.LengthUnit.YARDS,
-                36.0, Length.LengthUnit.INCHES);
-
-        // Yard ↔ Feet
-        demonstrateLengthComparison(1.0, Length.LengthUnit.YARDS,
-                3.0, Length.LengthUnit.FEET);
-
-        // CM ↔ Inches
-        demonstrateLengthComparison(1.0, Length.LengthUnit.CENTIMETERS,
-                0.393701, Length.LengthUnit.INCHES);
-
-        // CM ↔ Feet
-        demonstrateLengthComparison(30.48, Length.LengthUnit.CENTIMETERS,
-                1.0, Length.LengthUnit.FEET);
-
-        System.out.println("UC4 execution completed...");
+        Length l = new Length(2.0, Length.LengthUnit.YARDS);
+        System.out.println(demonstrateLengthConversion(l, Length.LengthUnit.INCHES)); // 72 inches
     }
 }
