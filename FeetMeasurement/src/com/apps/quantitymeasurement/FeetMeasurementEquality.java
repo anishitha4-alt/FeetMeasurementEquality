@@ -1,37 +1,70 @@
-package Ucom.apps.quantitymeasurement;
+package com.apps.quantitymeasurement;
 
 public class FeetMeasurementEquality {
 
-     public static class Feet {
+    // ===== FEET CLASS =====
+    public static class Feet {
 
         private final double value;
 
-         public Feet(double value) {
+        public Feet(double value) {
             this.value = value;
         }
 
-         @Override
+        @Override
         public boolean equals(Object obj) {
 
-             if (this == obj) {
-                return true;
-            }
+            if (this == obj) return true;
 
-             if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
+            if (obj == null || getClass() != obj.getClass()) return false;
 
-             Feet other = (Feet) obj;
+            Feet other = (Feet) obj;
 
-             return Double.compare(this.value, other.value) == 0;
+            return Double.compare(this.value, other.value) == 0;
         }
     }
 
-     public static void main(String[] args) {
+    // ===== INCHES CLASS (NEW FOR UC2) =====
+    public static class Inches {
 
+        private final double value;
+
+        public Inches(double value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj) return true;
+
+            if (obj == null || getClass() != obj.getClass()) return false;
+
+            Inches other = (Inches) obj;
+
+            return Double.compare(this.value, other.value) == 0;
+        }
+    }
+
+    // ===== FEET DEMO METHOD =====
+    public static void demonstrateFeetEquality() {
         Feet f1 = new Feet(1.0);
         Feet f2 = new Feet(1.0);
 
-        System.out.println("Are equal? " + f1.equals(f2));
+        System.out.println("Feet Equality: " + f1.equals(f2));
+    }
+
+    // ===== INCHES DEMO METHOD =====
+    public static void demonstrateInchesEquality() {
+        Inches i1 = new Inches(1.0);
+        Inches i2 = new Inches(1.0);
+
+        System.out.println("Inches Equality: " + i1.equals(i2));
+    }
+
+    // ===== MAIN =====
+    public static void main(String[] args) {
+        demonstrateFeetEquality();
+        demonstrateInchesEquality();
     }
 }
