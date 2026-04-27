@@ -2,29 +2,32 @@ package com.apps.quantitymeasurement;
 
 public class Length {
 
-    private double value;
-    private LengthUnit unit;
+    private final double value;
+    private final LengthUnit unit;
 
-    // Enum with ALL units (base unit = inches)
+    // Enum with conversion factors (BASE UNIT = INCHES)
     public enum LengthUnit {
-        FEET(12.0),
         INCHES(1.0),
+        FEET(12.0),
         YARDS(36.0),
         CENTIMETERS(0.393701);
 
-        private final double conversionFactor;
+        private final double factor;
 
-        LengthUnit(double conversionFactor) {
-            this.conversionFactor = conversionFactor;
+        LengthUnit(double factor) {
+            this.factor = factor;
         }
 
-        public double getConversionFactor() {
-            return conversionFactor;
+        public double getFactor() {
+            return factor;
         }
     }
 
     // Constructor
     public Length(double value, LengthUnit unit) {
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid value");
+        }
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
         }
@@ -32,28 +35,52 @@ public class Length {
         this.unit = unit;
     }
 
-    // Convert everything to base unit (inches)
+    // Convert to base unit (inches)
     private double toBaseUnit() {
-        return this.value * this.unit.getConversionFactor();
+        return value * unit.getFactor();
     }
 
-    // Comparison logic
-    public boolean compare(Length other) {
-        if (other == null) return false;
+    // ✅ UC5: STATIC CONVERSION METHOD
+    public static double convert(double value, LengthUnit source, LengthUnit target) {
 
-        double thisVal = this.toBaseUnit();
-        double otherVal = other.toBaseUnit();
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid value");
+        }
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("Units cannot be null");
+        }
 
-        return Math.abs(thisVal - otherVal) < 0.0001; // precision handling
+        // convert to base (inches)
+        double baseValue = value * source.getFactor();
+
+        // convert to target
+        double result = baseValue / target.getFactor();
+
+        return result;
     }
 
-    // equals() override
+    // ✅ Instance conversion (returns NEW object → immutability)
+    public Length convertTo(LengthUnit targetUnit) {
+        double convertedValue = convert(this.value, this.unit, targetUnit);
+        return new Length(convertedValue, targetUnit);
+    }
+
+    // equals() using base unit comparison
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (!(obj instanceof Length)) return false;
 
         Length other = (Length) obj;
-        return compare(other);
+
+        double thisBase = this.toBaseUnit();
+        double otherBase = other.toBaseUnit();
+
+        return Math.abs(thisBase - otherBase) < 1e-6;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%.2f %s", value, unit);
     }
 }
