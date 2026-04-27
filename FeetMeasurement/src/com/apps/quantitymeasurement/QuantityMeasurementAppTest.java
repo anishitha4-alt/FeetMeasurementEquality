@@ -65,4 +65,27 @@ public class QuantityMeasurementAppTest {
             new Length(1.0, null);
         });
     }
+    @Test
+    public void yardEqualsFeet() {
+        Length l1 = new Length(1.0, Length.LengthUnit.YARDS);
+        Length l2 = new Length(3.0, Length.LengthUnit.FEET);
+
+        assertTrue(l1.equals(l2));
+    }
+
+    @Test
+    public void yardEqualsInches() {
+        Length l1 = new Length(1.0, Length.LengthUnit.YARDS);
+        Length l2 = new Length(36.0, Length.LengthUnit.INCHES);
+
+        assertTrue(l1.equals(l2));
+    }
+
+    @Test
+    public void centimeterEqualsInches() {
+        Length l1 = new Length(1.0, Length.LengthUnit.CENTIMETERS);
+        Length l2 = new Length(0.393701, Length.LengthUnit.INCHES);
+
+        assertTrue(l1.equals(l2));
+    }
 }
