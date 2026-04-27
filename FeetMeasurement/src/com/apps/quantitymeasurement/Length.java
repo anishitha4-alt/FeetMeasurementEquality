@@ -2,13 +2,15 @@ package com.apps.quantitymeasurement;
 
 public class Length {
 
-    private final double value;
-    private final LengthUnit unit;
+    private double value;
+    private LengthUnit unit;
 
-    // ===== ENUM FOR UNITS =====
+    // Enum with ALL units (base unit = inches)
     public enum LengthUnit {
-        FEET(12.0),     // 1 foot = 12 inches
-        INCHES(1.0);    // base unit
+        FEET(12.0),
+        INCHES(1.0),
+        YARDS(36.0),
+        CENTIMETERS(0.393701);
 
         private final double conversionFactor;
 
@@ -21,37 +23,37 @@ public class Length {
         }
     }
 
-    // ===== CONSTRUCTOR =====
+    // Constructor
     public Length(double value, LengthUnit unit) {
-
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
         }
-
         this.value = value;
         this.unit = unit;
     }
 
-    // ===== CONVERT TO BASE UNIT (INCHES) =====
+    // Convert everything to base unit (inches)
     private double toBaseUnit() {
         return this.value * this.unit.getConversionFactor();
     }
 
-    // ===== COMPARE LOGIC =====
-    private boolean compare(Length other) {
-        return Double.compare(this.toBaseUnit(), other.toBaseUnit()) == 0;
+    // Comparison logic
+    public boolean compare(Length other) {
+        if (other == null) return false;
+
+        double thisVal = this.toBaseUnit();
+        double otherVal = other.toBaseUnit();
+
+        return Math.abs(thisVal - otherVal) < 0.0001; // precision handling
     }
 
-    // ===== EQUALS METHOD =====
+    // equals() override
     @Override
     public boolean equals(Object obj) {
-
         if (this == obj) return true;
-
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Length other = (Length) obj;
-
         return compare(other);
     }
 }
